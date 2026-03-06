@@ -1,0 +1,11 @@
+{
+    "name": "@webengine/input",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "module": "src/main.ts",
+    "repository": "git+https://github.com/diegochan25/web-engine.git",
+    "scripts": {
+        "test": "echo \"Error no test specified\" && exit 1"
+    }
+}
