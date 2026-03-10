@@ -1,53 +1,64 @@
-import { EngineStateKey } from "@/common/enum/EngineStateKey";
-import { EngineStateContext } from "./EngineStateContext";
-import { Time } from "./Time";
-import { EventBus, type EngineEventMap } from "./EventBus";
-import type { SimulationBridge } from "@interface/SimulationBridge";
-import { WorkerSimulationBridge } from "./WorkerSimulationBridge";
+import type { TaskContext } from "@/scheduler/TaskContext";
+import { EngineStateContext } from "@/state/EngineStateContext";
+import { TaskScheduler } from "@scheduler";
+import { Time } from "@time";
 
 export class GameEngine {
     private readonly _time: Time;
-    private readonly _stateContext: EngineStateContext;
-    private readonly _events: EventBus<EngineEventMap>;
-    private readonly _simulation: SimulationBridge;
+    private readonly _context: EngineStateContext;
+    private readonly _scheduler: TaskScheduler;
+    private readonly _taskContext: TaskContext;
     private _running: boolean = false;
-    private _lastFrame: number = 0;
 
-    public get events(): EventBus<EngineEventMap> {
-        return this._events;
+    public get time(): Time {
+        return this._time;
+    }
+
+    public get context(): EngineStateContext {
+        return this._context;
+    }
+
+    public get scheduler(): TaskScheduler {
+        return this._scheduler;
     }
 
     constructor() {
-        this._events = new EventBus();
-        this._stateContext = new EngineStateContext(this);
-        this._time = new Time(this._events);
-        this._simulation = new WorkerSimulationBridge(new URL("./WebWorker.ts", import.meta.url));
+        this._time = new Time();
+        this._context = new EngineStateContext();
+        this._taskContext = Object.freeze({ time: this._time });
+        this._scheduler = new TaskScheduler(this._taskContext);
     }
 
-    private _tick = (): void => {
-        if (!this._running) return;
-        const now = performance.now();
-        const deltatime = now - this._lastFrame;
+    private readonly _frame = (): void => {
+        this._time.update();
 
-        this._time.update(deltatime);
-        this._stateContext.update(this._time.deltatime);
+        if (this._context.canFixedUpdate()) {
+            const fixedSteps = this._time.getFixedSteps();
+            for (let i = 0; i < fixedSteps; i++) {
+                this._scheduler.fixedUpdate();
+            }
+        }
 
-        this._lastFrame = now;
-        requestAnimationFrame(this._tick);
-    }
+        if (this._context.canUpdate()) {
+            this._scheduler.update();
+        }
+        if (this._context.canLateUpdate()) {
+            this._scheduler.lateUpdate();
+        }
 
-    public async start(): Promise<void> {
+        if (this._running) {
+            requestAnimationFrame(this._frame);
+        }
+    };
+
+    public start(): void {
         if (this._running) return;
-        await this._stateContext.transition(EngineStateKey.Started);
         this._running = true;
-        this._lastFrame = performance.now();
-        this.events.emit("engineStarted", undefined);
-        requestAnimationFrame(this._tick);
+
+        requestAnimationFrame(this._frame);
     }
 
-    public async stop(): Promise<void> {
+    public stop(): void {
         this._running = false;
-        await this._stateContext.transition(EngineStateKey.Stopped);
-        this.events.emit("engineStopped", undefined);
     }
 }
