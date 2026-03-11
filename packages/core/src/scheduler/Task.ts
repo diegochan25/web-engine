@@ -1,18 +1,31 @@
+import type { Time } from "@time";
 import type { TaskContext } from "./TaskContext";
 
-export type SupportsUpdate<T extends TaskContext = TaskContext> = {
-    onUpdate: (context: T) => void;
-}
-export type SupportsLateUpdate<T extends TaskContext = TaskContext> = {
-    onLateUpdate: (context: T) => void;
-}
-export type SupportsFixedUpdate<T extends TaskContext = TaskContext> = {
-    onFixedUpdate: (context: T) => void;
+export type SupportsUpdate = {
+    onUpdate(): void;
 }
 
-export type Task<T extends TaskContext = TaskContext> = 
-    Partial<
-        SupportsUpdate<T> & 
-        SupportsLateUpdate<T> & 
-        SupportsFixedUpdate<T>
-    >;
+export type SupportsLateUpdate = {
+    onLateUpdate(): void;
+}
+
+export type SupportsFixedUpdate = {
+    onFixedUpdate(): void;
+}
+
+
+export abstract class Task implements Partial<SupportsUpdate & SupportsLateUpdate & SupportsFixedUpdate> {
+    protected context!: TaskContext;
+
+    public inject(context: TaskContext) {
+        this.context = context;
+    }
+
+    public get time(): Time {
+        return this.context.time;
+    }
+
+    public onUpdate?(): void;
+    public onLateUpdate?(): void;
+    public onFixedUpdate?(): void;
+}

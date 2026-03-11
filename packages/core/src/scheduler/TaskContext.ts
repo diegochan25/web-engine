@@ -1,5 +1,5 @@
-import type { Time } from "@time";
+import type { Time } from "@/time";
 
 export interface TaskContext {
-    readonly time: Time;
+    time: Time;
 }

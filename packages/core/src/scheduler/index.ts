@@ -1,2 +1,2 @@
-export type { SupportsFixedUpdate, SupportsLateUpdate, SupportsUpdate, Task } from "./Task";
+export { Task, type SupportsFixedUpdate, type SupportsLateUpdate, type SupportsUpdate } from "./Task";
 export { TaskScheduler } from "./TaskScheduler";

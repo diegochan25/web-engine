@@ -1,0 +1,60 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "web-engine",
+    },
+    "packages/assets": {
+      "name": "@webengine/assets",
+      "version": "0.1.0",
+    },
+    "packages/audio": {
+      "name": "@webengine/audio",
+      "version": "0.1.0",
+    },
+    "packages/core": {
+      "name": "@webengine/core",
+      "version": "0.1.0",
+    },
+    "packages/ecs": {
+      "name": "@webengine/ecs",
+      "version": "0.1.0",
+      "dependencies": {
+        "@webengine/core": "workspace:*",
+      },
+    },
+    "packages/input": {
+      "name": "@webengine/input",
+      "version": "0.1.0",
+    },
+    "packages/math": {
+      "name": "@webengine/math",
+      "version": "0.1.0",
+    },
+    "packages/rendering": {
+      "name": "@webengine/rendering",
+      "version": "0.1.0",
+    },
+    "packages/save": {
+      "name": "@webengine/save",
+      "version": "0.1.0",
+    },
+  },
+  "packages": {
+    "@webengine/assets": ["@webengine/assets@workspace:packages/assets"],
+
+    "@webengine/audio": ["@webengine/audio@workspace:packages/audio"],
+
+    "@webengine/core": ["@webengine/core@workspace:packages/core"],
+
+    "@webengine/ecs": ["@webengine/ecs@workspace:packages/ecs"],
+
+    "@webengine/input": ["@webengine/input@workspace:packages/input"],
+
+    "@webengine/math": ["@webengine/math@workspace:packages/math"],
+
+    "@webengine/rendering": ["@webengine/rendering@workspace:packages/rendering"],
+
+    "@webengine/save": ["@webengine/save@workspace:packages/save"],
+  }
+}
